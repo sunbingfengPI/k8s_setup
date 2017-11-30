@@ -5,7 +5,7 @@ set -o pipefail
 
 install-docker-ubuntu() {
     apt-get update
-    apt-get install -y docker.io
+    apt-get install -y docker-ce
     systemctl enable docker
     systemctl start docker
 }

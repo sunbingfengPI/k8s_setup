@@ -1,0 +1,58 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gpu-matmul
+spec:
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: gpu-matmul
+    spec:
+      volumes:
+      - hostPath:
+          path: /usr/lib/nvidia-384/bin
+        name: bin
+      - hostPath:
+          path: /usr/lib/nvidia-384
+        name: lib
+      - name: libcuda-so
+        hostPath:
+          path: /usr/lib/x86_64-linux-gnu/libcuda.so
+      - name: libcuda-so-1
+        hostPath:
+          path: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+      - name: libcuda-so-384-90
+        hostPath:
+          path: /usr/lib/x86_64-linux-gnu/libcuda.so.384.90
+      containers:
+      - name: gpu-matmul
+        image: k8stest/matmul:v0.1
+        env:
+        - name: LD_LIBRARY_PATH
+          value: /usr/local/nvidia/lib
+        - name: MATMUL_DEVICE
+          value: gpu
+        - name: MATMUL_SHAPE
+          value: "15000"
+        ports:
+        - containerPort: 8888
+        resources:
+          limits:
+            alpha.kubernetes.io/nvidia-gpu: 1
+        volumeMounts:
+        - mountPath: /usr/local/nvidia/bin
+          name: bin
+        - mountPath: /usr/local/nvidia/lib
+          name: lib
+        - mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so
+          name: libcuda-so
+        - mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+          name: libcuda-so-1
+        - mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.384.90
+          name: libcuda-so-384-90
+      nodeSelector:
+        kubernetes.io/hostname: perceptin-server
+      restartPolicy: OnFailure
+---

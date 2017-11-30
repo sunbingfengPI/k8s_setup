@@ -39,7 +39,7 @@ lsb_dist=$(lsb-dist)
 case "$lsb_dist" in
 
     ubuntu)
-        install-docker-ubuntu
+        #install-docker-ubuntu
         install-kubelet-ubuntu
         setup-master
         install-network-plugin
